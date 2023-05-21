@@ -1,5 +1,5 @@
 use clippy_utils::diagnostics::span_lint_and_help;
-use rustc_ast::{NodeId,visit::FnKind};
+use rustc_ast::{visit::FnKind, NodeId};
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_session::{declare_lint_pass, declare_tool_lint};
 use rustc_span::Span;
