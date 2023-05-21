@@ -1,39 +1,51 @@
-use rustc_ast::ast::*;
+use clippy_utils::diagnostics::span_lint_and_help;
+use rustc_ast::{NodeId,visit::FnKind};
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_session::{declare_lint_pass, declare_tool_lint};
-use clippy_utils::diagnostics::span_lint_and_help;
 use rustc_span::Span;
-use rustc_ast::visit::FnKind;
 
 declare_clippy_lint! {
     /// ### What it does
+    /// Checks for ... (describe what the lint matches).
     ///
     /// ### Why is this bad?
+    /// Supply the reason for linting the code.
     ///
     /// ### Example
-    /// ```rust
-    /// // example code where clippy issues a warning
+    ///
+    /// ```rust,ignore
+    /// // A short example of code that triggers the lint
     /// ```
+    ///
     /// Use instead:
-    /// ```rust
-    /// // example code which does not raise clippy warning
+    /// ```rust,ignore
+    /// // A short example of improved code that doesn't trigger the lint
     /// ```
     #[clippy::version = "1.71.0"]
     pub FOO_FUNCTIONS,
     pedantic,
-    "default lint description"
+    "function named `foo`, which is not a descriptive name"
 }
 declare_lint_pass!(FooFunctions => [FOO_FUNCTIONS]);
 
 impl EarlyLintPass for FooFunctions {
     fn check_fn(&mut self, cx: &EarlyContext<'_>, fn_kind: FnKind<'_>, span: Span, _: NodeId) {
-        span_lint_and_help(
-            cx,
-            FOO_FUNCTIONS,
-            span,
-            "function named `foo`",
-            None,
-            "consider using a more meaningful name"
-        );
+        if is_foo_fn(fn_kind) {
+            span_lint_and_help(
+                cx,
+                FOO_FUNCTIONS,
+                span,
+                "function named `foo`",
+                None,
+                "consider using a more meaningful name",
+            );
+        }
+    }
+}
+
+fn is_foo_fn(fn_kind: FnKind<'_>) -> bool {
+    match fn_kind {
+        FnKind::Fn(_, ident, ..) => ident.name.as_str() == "foo",
+        FnKind::Closure(..) => false,
     }
 }
